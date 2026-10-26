@@ -8,16 +8,13 @@ const authApiRequest = {
 	} ),
 
 	sLogout: (body: LogoutBodyType & { accessToken: string }) => http.post("/auth/logout", {
-		accessToken: body.accessToken
+		refreshToken: body.refreshToken
 	}, {
 		headers: {
-			Authorziation: `Bearer ${body.accessToken}`,
+			Authorization: `Bearer ${body.accessToken}`,
 		}
 	}),
-	logout: (body: LogoutBodyType) => http.post("/api/auth/logout", body, {
-		headers: {
-			'Content-Type': 'application/json'
-		},
+	logout: () => http.post("/api/auth/logout", null, { // accessToken và RefeshToken tự động gửi lên cookie nên không cần truyền vào body, NextJS sẽ gọi đến BE server. Cách này giúp tránh lỗi CORS.
 		baseUrl: ''
 	}),
 }

@@ -15,7 +15,7 @@ export function proxy(request: NextRequest) {
 	if (unAuthPaths.some(path => pathname.startsWith(path)) && isAuth) { 
 		return NextResponse.redirect(new URL('/', request.url))
 	}
-	return NextResponse.next()
+	return NextResponse.next() // cho tiếp tục request nếu k rơi vào 2 trường hợp trên
 }
  
 export const config = {

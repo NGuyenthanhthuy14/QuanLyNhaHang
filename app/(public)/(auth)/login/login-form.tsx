@@ -46,7 +46,7 @@ export default function LoginForm() {
       <CardContent>
         <Form {...form}>
           <form 
-            className='space-y-2 max-w-150 shrink-0 w-full' 
+            className='space-y-2 max-w-150 shrink-0  w-full' 
             noValidate
             onSubmit={form.handleSubmit(onSubmit, err => {
               console.log(err)
