@@ -10,9 +10,11 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useLoginMutation } from '@/queries/useAuth'
 import { toast } from 'sonner'
 import { handleErrorApi } from '@/lib/utils'
+import { useRouter } from 'next/navigation'
 
 export default function LoginForm() {
   const loginMutation = useLoginMutation()
+  const router = useRouter()
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
     defaultValues: {
@@ -28,6 +30,7 @@ export default function LoginForm() {
       const res = await loginMutation.mutateAsync(data)
 
       toast.success("Đăng nhập thành công")
+      router.push('/manage/dashboard')
     } catch (error) {
       toast.error("Đăng nhập thất bại")
 

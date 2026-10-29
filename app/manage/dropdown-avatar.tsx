@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { useLogoutMutation } from '@/queries/useAuth'
 import { useRouter } from 'next/navigation'
+import { handleErrorApi } from '@/lib/utils'
 
 const account = {
   name: 'Nguyễn Văn A',
@@ -27,9 +28,11 @@ export default function DropdownAvatar() {
     
     try {
       await logoutMutation.mutateAsync()
-      router.push('/')
+      router.push('/login')
     } catch (error) {
-      console.error('Logout failed:', error)
+      handleErrorApi({
+        error
+      })
     }
   }
   return (
