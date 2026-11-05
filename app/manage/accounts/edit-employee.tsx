@@ -51,7 +51,7 @@ export default function EditEmployee({
     return avatar
   }, [file, avatar])
 
-  return (
+  return ( 
     <Dialog
       open={Boolean(id)}
       onOpenChange={(value) => {
@@ -60,7 +60,7 @@ export default function EditEmployee({
         }
       }}
     >
-      <DialogContent className='sm:max-w-[600px] max-h-screen overflow-auto'>
+      <DialogContent className='sm:max-w-150 max-h-screen overflow-auto'>
         <DialogHeader>
           <DialogTitle>Cập nhật tài khoản</DialogTitle>
           <DialogDescription>Các trường tên, email, mật khẩu là bắt buộc</DialogDescription>
@@ -74,7 +74,7 @@ export default function EditEmployee({
                 render={({ field }) => (
                   <FormItem>
                     <div className='flex gap-2 items-start justify-start'>
-                      <Avatar className='aspect-square w-[100px] h-[100px] rounded-md object-cover'>
+                      <Avatar className='aspect-square w-[1[[00px] h-25 rounded-md object-cover'>
                         <AvatarImage src={previewAvatarFromFile} />
                         <AvatarFallback className='rounded-none'>{name || 'Avatar'}</AvatarFallback>
                       </Avatar>
@@ -92,13 +92,13 @@ export default function EditEmployee({
                         className='hidden'
                       />
                       <button
-                        className='flex aspect-square w-[100px] items-center justify-center rounded-md border border-dashed'
+                        className='flex aspect-square w-25 items-center justify-center rounded-md border border-dashed'
                         type='button'
                         onClick={() => avatarInputRef.current?.click()}
                       >
                         <Upload className='h-4 w-4 text-muted-foreground' />
                         <span className='sr-only'>Upload</span>
-                      </button>
+                      </button> 
                     </div>
                   </FormItem>
                 )}
@@ -160,8 +160,8 @@ export default function EditEmployee({
                         <div className='col-span-3 w-full space-y-2'>
                           <Input id='password' className='w-full' type='password' {...field} />
                           <FormMessage />
-                        </div>
-                      </div>
+                        </div>.   
+                      </div>     
                     </FormItem>
                   )}
                 />
