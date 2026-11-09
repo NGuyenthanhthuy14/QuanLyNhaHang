@@ -9,8 +9,19 @@ import { UpdateMeBody, UpdateMeBodyType } from '@/schemaValidations/account.sche
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useAccountProfile, useUpdateMeMutation } from '@/queries/useAccount'
+import { useUploadMediaMutation } from '@/queries/useMedia'
+import { toast } from 'sonner'
+import { handleErrorApi } from '@/lib/utils'
 
 export default function UpdateProfileForm() {
+  const  [file, setFile] = useState<File | null>(null)
+  const avataInputRef = useRef<HTMLInputElement | null>(null)
+  const {data} = useAccountProfile()
+
+  const updateMeMutation = useUpdateMeMutation()
+  const uploadMediaMutation = useUploadMediaMutation()
   const form = useForm<UpdateMeBodyType>({
     resolver: zodResolver(UpdateMeBody),
     defaultValues: {
@@ -19,9 +30,57 @@ export default function UpdateProfileForm() {
     }
   })
 
+  useEffect (() => {
+    if (data?.payload?.data) {
+      const { name, avatar } = data?.payload.data
+      form.reset({
+        name,
+        avatar: avatar ?? ''
+      })
+    }
+  }, [form, data])
+
+  const avatar = form.watch('avatar')
+  const name = form.watch('name')
+
+  const avatarUrl = file ? URL.createObjectURL(file) : avatar
+
+  const reset = () => {
+    form.reset ();
+    setFile(null)
+  }
+
+  const onSubmit = async (value:UpdateMeBodyType ) => {
+    if (updateMeMutation.isPending) return;
+    try {
+      let body = value
+      if (file) {
+        const formData = new FormData()
+        formData.append('file', file);
+        const uploadMutation = await uploadMediaMutation.mutateAsync(formData)
+        const imageUrl = uploadMutation.payload
+        body = {
+          ...value,
+          avatar: imageUrl.data
+        }
+      }
+      const result = await updateMeMutation.mutateAsync(body)
+      toast.success(result.payload.message)
+    }
+    catch(error) {
+      handleErrorApi({
+        error,
+        setError: form.setError
+      })
+    }
+  }
   return (
     <Form {...form}>
-      <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8'>
+      <form noValidate 
+      className='grid auto-rows-max items-start gap-4 md:gap-8'
+      onReset={reset}
+      onSubmit={form.handleSubmit(onSubmit)}
+      >
         <Card x-chunk='dashboard-07-chunk-0'>
           <CardHeader>
             <CardTitle>Thông tin cá nhân</CardTitle>
@@ -34,14 +93,23 @@ export default function UpdateProfileForm() {
                 render={({ field }) => (
                   <FormItem>
                     <div className='flex gap-2 items-start justify-start'>
-                      <Avatar className='aspect-square w-[100px] h-[100px] rounded-md object-cover'>
-                        <AvatarImage src={'Duoc'} />
-                        <AvatarFallback className='rounded-none'>{'duoc'}</AvatarFallback>
+                      <Avatar className='aspect-square w-25 h-25 rounded-md object-cover'>
+                        <AvatarImage src={avatarUrl }  />
+                        <AvatarFallback className='rounded-none'>{name}</AvatarFallback>
                       </Avatar>
-                      <input type='file' accept='image/*' className='hidden' />
+                      <input type='file' accept='image/*' className='hidden' 
+                        ref={avataInputRef} 
+                        onChange={e => {
+                          const file = e.target.files?.[0]
+                          if (file) {
+                            setFile(file)
+                          }
+                        }}
+                        />
                       <button
-                        className='flex aspect-square w-[100px] items-center justify-center rounded-md border border-dashed'
+                        className='flex aspect-square w-25 items-center justify-center rounded-md border border-dashed'
                         type='button'
+                        onClick={() => avataInputRef.current?.click()}
                       >
                         <Upload className='h-4 w-4 text-muted-foreground' />
                         <span className='sr-only'>Upload</span>
@@ -66,7 +134,8 @@ export default function UpdateProfileForm() {
               />
 
               <div className=' items-center gap-2 md:ml-auto flex'>
-                <Button variant='outline' size='sm' type='reset'>
+                <Button
+                variant='outline' size='sm' type='reset'>
                   Hủy
                 </Button>
                 <Button size='sm' type='submit'>
